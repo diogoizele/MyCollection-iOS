@@ -11,4 +11,5 @@ struct CollectionItem: Codable {
     let category: CategoryEnum
     let description: String
     let imageUrl: String
+    let ratings: [Rating]
 }
