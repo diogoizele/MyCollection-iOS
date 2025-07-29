@@ -19,7 +19,7 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.contentMode = .scaleAspectFit
-        view.image = UIImage(named: "LayerGroupSolid")
+        view.image = UIImage(named: "layer-group-solid-full")
         return view
     }()
     
@@ -79,6 +79,58 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return view
     }()
     
+    private let categoryCounterCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 12
+        layout.minimumInteritemSpacing = 8
+        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.showsHorizontalScrollIndicator = false
+        view.contentInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        view.register(CategoryCounterCell.self, forCellWithReuseIdentifier: CategoryCounterCell.reuseIdentifier)
+        return view
+    }()
+    
+    private let tabCategoriesContainerView: UIStackView = {
+        let view = UIStackView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.spacing = 8
+        view.axis = .horizontal
+        view.alignment = .center
+        view.distribution = .fillProportionally
+        return view
+    }()
+    
+    private let allItemsTabButton: TabButton = {
+        let view = TabButton()
+        view.title = "Todos"
+        view.isSelected = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let booksTabButton: TabButton = {
+        let view = TabButton()
+        view.title = "Livros"
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let moviesTabButton: TabButton = {
+        let view = TabButton()
+        view.title = "Filmes"
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let gamesTabButton: TabButton = {
+        let view = TabButton()
+        view.title = "Jogos"
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let tableView: UITableView = {
         let view = UITableView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -86,16 +138,13 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return view
     }()
     
-    private let textView: UITextField = {
-        let view = UITextField()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.borderStyle = .roundedRect
-        view.placeholder = "Search..."
-        return view
-    }()
-    
-    
     private var items: [CollectionItem] = []
+    private let categories: [Category] = [
+        Category(name: "Livros", quantity: 12, image: "book-solid-full"),
+        Category(name: "Filmes", quantity: 24, image: "film-solid-full"),
+        Category(name: "Jogos", quantity: 8, image: "gamepad-solid-full"),
+    ]
+    private var currentTabFilter: CategoryEnum? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,8 +160,6 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     
     private func setup() {
-        
-        
         view.backgroundColor = .systemBackground
         
         view.addSubview(topBarView)
@@ -130,9 +177,16 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
         headerSubtitleView.setContentHuggingPriority(.required, for: .vertical)
         headerSubtitleView.setContentCompressionResistancePriority(.required, for: .vertical)
+        
+        view.addSubview(categoryCounterCollectionView)
+        view.addSubview(tabCategoriesContainerView)
+        
+        tabCategoriesContainerView.addArrangedSubview(allItemsTabButton)
+        tabCategoriesContainerView.addArrangedSubview(booksTabButton)
+        tabCategoriesContainerView.addArrangedSubview(moviesTabButton)
+        tabCategoriesContainerView.addArrangedSubview(gamesTabButton)
 
         view.addSubview(tableView)
-        view.addSubview(textView)
         
         NSLayoutConstraint.activate([
             topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -161,11 +215,17 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
             headerStackView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             headerStackView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
                         
-            textView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: 24),
-            textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            categoryCounterCollectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 16),
+            categoryCounterCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            categoryCounterCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            categoryCounterCollectionView.heightAnchor.constraint(equalToConstant: CategoryCounterCell.size.height),
             
-            tableView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 8),
+            tabCategoriesContainerView.topAnchor.constraint(equalTo: categoryCounterCollectionView.bottomAnchor, constant: 24),
+            tabCategoriesContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            tabCategoriesContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            tabCategoriesContainerView.heightAnchor.constraint(equalToConstant: 44),
+            
+            tableView.topAnchor.constraint(equalTo: tabCategoriesContainerView.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -173,6 +233,14 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         tableView.dataSource = self
         tableView.delegate = self
+        
+        categoryCounterCollectionView.dataSource = self
+        categoryCounterCollectionView.delegate = self
+        
+        allItemsTabButton.delegate = self
+        booksTabButton.delegate = self
+        moviesTabButton.delegate = self
+        gamesTabButton.delegate = self
     }
     
     private func loadItems() {
@@ -201,3 +269,55 @@ class HomeViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
 }
 
+extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        categories.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCounterCell.reuseIdentifier, for: indexPath) as? CategoryCounterCell else {
+            return UICollectionViewCell()
+        }
+        print("index path: \(indexPath.row)")
+        cell.configure(with: categories[indexPath.row])
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CategoryCounterCell.size
+    }
+}
+
+
+extension HomeViewController: TabButtonDelegate {
+    private func clearSelection() {
+        let tabButtons: [TabButton] = [allItemsTabButton, booksTabButton, moviesTabButton, gamesTabButton]
+        for button in tabButtons {
+            button.isSelected = false
+        }
+    }
+    
+    private func updateCurrentTabFilter (title: String?) {
+        switch title {
+        case "Livros":
+            self.currentTabFilter = .Book
+        case "Filmes":
+            self.currentTabFilter = .Movie
+        case "Jogos":
+            self.currentTabFilter = .Game
+        default:
+            self.currentTabFilter = nil
+        }
+    }
+    
+    func tabButtonDidTap(_ button: TabButton) {
+        clearSelection()
+        updateCurrentTabFilter(title: button.title)
+
+        button.isSelected = true
+    }
+}
