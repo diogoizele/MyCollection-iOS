@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "layer-group-solid.png",
+      "filename" : "gamepad-solid-full.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "layer-group-solid@2x.png",
+      "filename" : "gamepad-solid-full@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "layer-group-solid@3x.png",
+      "filename" : "gamepad-solid-full@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
