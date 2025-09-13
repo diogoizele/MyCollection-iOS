@@ -11,3 +11,14 @@ enum CategoryEnum: Codable {
     case Record
     case Game
 }
+
+extension CategoryEnum {
+    var localizedName: String {
+        switch self {
+        case .Book: return "Livro"
+        case .Movie: return "Filme"
+        case .Record: return "Disco"
+        case .Game: return "Jogo"
+        }
+    }
+}

@@ -8,8 +8,9 @@
 struct CollectionItem: Codable {
     let id: String
     let title: String
+    let author: String
     let category: CategoryEnum
     let description: String
     let imageUrl: String
-    let ratings: [Rating]
+    let rating: Double
 }
