@@ -5,7 +5,7 @@
 //  Created by Diogo Izele on 27/07/25.
 //
 
-struct Category: Codable {
+struct CategoryCounter: Codable {
     let name: String
     let quantity: Int
     let image: String

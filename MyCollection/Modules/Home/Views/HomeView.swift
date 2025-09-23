@@ -124,6 +124,22 @@ final class HomeView: UIView {
         return view
     }()
     
+    let floatingActionButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .bold)
+        let image = UIImage(systemName: "plus", withConfiguration: config)
+        button.setImage(image, for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = .primary
+        button.layer.cornerRadius = 28  // metade do tamanho para ficar circular
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = CGSize(width: 0, height: 3)
+        button.layer.shadowRadius = 3
+        return button
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .systemBackground
@@ -139,6 +155,7 @@ final class HomeView: UIView {
         addSubview(tabCategoriesContainerView)
         addSubview(tableViewHeaderView)
         addSubview(tableView)
+        addSubview(floatingActionButton)
       
         headerView.addSubview(headerStackView)
         headerStackView.addArrangedSubview(headerTitleView)
@@ -190,6 +207,10 @@ final class HomeView: UIView {
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
             
+            floatingActionButton.widthAnchor.constraint(equalToConstant: 56),
+            floatingActionButton.heightAnchor.constraint(equalToConstant: 56),
+            floatingActionButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            floatingActionButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -24)
         ])
     }
 }
