@@ -29,22 +29,9 @@
 		24C00AD42E29BAA6008E8986 /* MyCollectionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyCollectionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		24C00ADC2E29BAA6008E8986 /* Exceptions for "MyCollection" folder in "MyCollection" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 24C00AB32E29BAA5008E8986 /* MyCollection */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		24C00AB62E29BAA5008E8986 /* MyCollection */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				24C00ADC2E29BAA6008E8986 /* Exceptions for "MyCollection" folder in "MyCollection" target */,
-			);
 			path = MyCollection;
 			sourceTree = "<group>";
 		};
