@@ -77,7 +77,7 @@ class CategoryCounterCell: UICollectionViewCell {
         ])
     }
     
-    func configure(with: Category) {
+    func configure(with: CategoryCounter) {
         counterLabel.text = String(with.quantity)
         nameLabel.text = with.name
         iconImageView.image = UIImage(named: with.image)

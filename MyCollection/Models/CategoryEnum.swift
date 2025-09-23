@@ -8,7 +8,7 @@
 enum CategoryEnum: Codable {
     case Book
     case Movie
-    case Record
+    case Album
     case Game
 }
 
@@ -17,7 +17,7 @@ extension CategoryEnum {
         switch self {
         case .Book: return "Livro"
         case .Movie: return "Filme"
-        case .Record: return "Disco"
+        case .Album: return "Álbum"
         case .Game: return "Jogo"
         }
     }

@@ -101,7 +101,7 @@ struct CollectionItemsMock {
             id: "11",
             title: "Dark Side of the Moon",
             author: "Pink Floyd",
-            category: .Record,
+            category: .Album,
             description: "Classic progressive rock album.",
             imageUrl: "https://example.com/darkside.jpg",
             rating: 4.8
@@ -182,7 +182,7 @@ struct CollectionItemsMock {
             id: "20",
             title: "The Beatles – Abbey Road",
             author: "The Beatles",
-            category: .Record,
+            category: .Album,
             description: "Iconic album.",
             imageUrl: "https://example.com/abbeyroad.jpg",
             rating: 4.7
