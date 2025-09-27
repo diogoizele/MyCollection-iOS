@@ -11,13 +11,22 @@ import UIKit
 final class HomeViewController: UIViewController {
 
     private let contentView = HomeView()
-    private let viewModel = HomeViewModel(repository: CollectionRepository(service: CollectionService(client: GraphQLClient(url: URL(string:"http://localhost:4000/graphql")!))))
+    private let viewModel: HomeViewModel
     
     private var cancellables = Set<AnyCancellable>()
 
     private let collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private let loadingView = UIActivityIndicatorView(style: .large)
 
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     
     override func loadView() {
         view = contentView

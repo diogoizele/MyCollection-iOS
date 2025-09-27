@@ -16,7 +16,7 @@ final class MainTabBarController: UITabBarController {
     
     private func setupTabs() {
         
-        let homeVC = HomeViewController()
+        let homeVC = DIContainer.shared.makeHomeViewController()
         homeVC.tabBarItem = UITabBarItem(title: "Home", image: setupIcon(named: "house-solid-full"), tag: 0)
         
         let collectionVC = CollectionsViewController()
