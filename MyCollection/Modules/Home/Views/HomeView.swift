@@ -213,4 +213,8 @@ final class HomeView: UIView {
             floatingActionButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -24)
         ])
     }
+    
+    func updateStats(stats: CollectionStats) {
+        
+    }
 }

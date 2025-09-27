@@ -5,57 +5,79 @@
 //  Created by Diogo Izele on 17/07/25.
 //
 
+import Combine
 import UIKit
 
 final class HomeViewController: UIViewController {
 
+    private let contentView = HomeView()
+    private let viewModel = HomeViewModel(repository: CollectionRepository(service: CollectionService(client: GraphQLClient(url: URL(string:"http://localhost:4000/graphql")!))))
     
-    private var items: [CollectionItem] = []
-    private let categories: [CategoryCounter] = [
-        CategoryCounter(name: "Livros", quantity: 12, image: "book-solid-full"),
-        CategoryCounter(name: "Filmes", quantity: 24, image: "film-solid-full"),
-        CategoryCounter(name: "Jogos", quantity: 8, image: "gamepad-solid-full"),
-    ]
-    private var currentTabFilter: CategoryEnum? = nil
+    private var cancellables = Set<AnyCancellable>()
+
+    private let collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private let loadingView = UIActivityIndicatorView(style: .large)
+
     
-    private var homeView: HomeView { view as! HomeView}
-   
     override func loadView() {
-        view = HomeView()
+        view = contentView
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        homeView.tableView.dataSource = self
-        homeView.tableView.delegate = self
+        contentView.tableView.dataSource = self
+        contentView.tableView.delegate = self
         
-        homeView.categoryCounterCollectionView.dataSource = self
-        homeView.categoryCounterCollectionView.delegate = self
+        contentView.categoryCounterCollectionView.dataSource = self
+        contentView.categoryCounterCollectionView.delegate = self
         
-        homeView.allItemsTabButton.delegate = self
-        homeView.booksTabButton.delegate = self
-        homeView.moviesTabButton.delegate = self
-        homeView.gamesTabButton.delegate = self
+        contentView.allItemsTabButton.delegate = self
+        contentView.booksTabButton.delegate = self
+        contentView.moviesTabButton.delegate = self
+        contentView.gamesTabButton.delegate = self
         
-        loadItems()
+        viewModel.onItemsChanged = { [weak self] in
+            self?.contentView.tableView.reloadData()
+        }
+        
+        viewModel.loadItems()
+        viewModel.loadStats()
+        bind()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
     
-    private func loadItems() {
-        items = CollectionItemsMock.items
-        homeView.tableView.reloadData()
+    private func bind() {
+        viewModel.$stats
+               .receive(on: DispatchQueue.main)
+               .sink { [weak self] stats in
+                   guard let stats else { return }
+                   self?.contentView.updateStats(stats: stats)
+               }
+               .store(in: &cancellables)
+
+           viewModel.$isLoading
+               .sink { [weak self] isLoading in
+//                   self?.contentView.setLoading(isLoading)
+               }
+               .store(in: &cancellables)
+
+           viewModel.$errorMessage
+               .sink { [weak self] message in
+                   guard let message else { return }
+//                   self?.contentView.showError(message)
+               }
+               .store(in: &cancellables)
     }
-  
 }
 
 extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
+        return viewModel.items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -63,7 +85,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
         
-        cell.configure(with: items[indexPath.row])
+        cell.configure(with: viewModel.items[indexPath.row])
         return cell
     }
     
@@ -75,7 +97,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        categories.count
+        viewModel.categoriesCounter.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -83,7 +105,7 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
             return UICollectionViewCell()
         }
         print("index path: \(indexPath.row)")
-        cell.configure(with: categories[indexPath.row])
+        cell.configure(with: viewModel.categoriesCounter[indexPath.row])
         
         return cell
     }
@@ -99,10 +121,10 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
 extension HomeViewController: TabButtonDelegate {
     private func clearSelection() {
         let tabButtons: [TabButton] = [
-            homeView.allItemsTabButton,
-            homeView.booksTabButton,
-            homeView.moviesTabButton,
-            homeView.gamesTabButton]
+            contentView.allItemsTabButton,
+            contentView.booksTabButton,
+            contentView.moviesTabButton,
+            contentView.gamesTabButton]
         for button in tabButtons {
             button.isSelected = false
         }
@@ -111,13 +133,13 @@ extension HomeViewController: TabButtonDelegate {
     private func updateCurrentTabFilter (title: String?) {
         switch title {
         case "Livros":
-            self.currentTabFilter = .Book
+            viewModel.selectedCategory = .category(.Book)
         case "Filmes":
-            self.currentTabFilter = .Movie
+            viewModel.selectedCategory = .category(.Movie)
         case "Jogos":
-            self.currentTabFilter = .Game
+            viewModel.selectedCategory = .category(.Game)
         default:
-            self.currentTabFilter = nil
+            viewModel.selectedCategory = .all
         }
     }
     
